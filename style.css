@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: black;
+    padding: 0%;
+    margin: 0%;
+}
+#intro {
+    background-color: #0d1f3a;
+    color: white;
+}
+.hello {
+    padding: 50px;
+    margin: 20px;
+}
+.mainHeading {
+    font-size: 80px;
+    font-weight: 800;
+    background: linear-gradient(to right, rgb(77, 194, 155), rgb(92, 66, 206));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+h2 {
+    font-size: xx-large;
+}
+.description {
+    font-size: large;
+}
+.btn {
+    background-color: #22c55e;
+    color: white;
+}
+a {
+    text-decoration: none;
+    color: grey;
+}
+#main {
+    padding: 80px;
+    color: white;
+    background-image: linear-gradient(to right, rgb(71, 50, 161), rgb(22, 79, 60));
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+.topTracks {
+    width: 200px;
+    justify-content: center;
+}
+.favArtist {
+    width: 200px;
+    justify-content: center;
+}
+.stats {
+    width: 200px;
+}
+footer {
+    color: white;
+}
