@@ -1,9 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Early Wrapped</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="style.css" />
     </head>
-    <body>
-        <h1>hello world!</h1>
+    <body id="mainWindow">
+        <div class="welcome p-4 m-4">
+            <h1 class="text-center mainHeading">Your Early Wrapped!</h1>
+            <p class="text-center subHeading">Here's what you've been listening to</p>
+            <div class="mx-4 px-4">
+                <div class="subsubHead">
+                    <p class="text-center">Based on your recent listening activity</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2>Total Minutes</h2>
+                            <h1 id="totalMinutes">number</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2>Top Genre</h2>
+                            <h1 id="topGenre">name</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2>Unique Artists</h2>
+                            <h1 id="uniqueArtists">number</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="card col m-2" style="width: 18rem">
+                    <h1 class="cart-title">Your Top Tracks</h1>
+                    <ul class="list-group list-group-flush" id="topTracks">
+                    </ul>
+                </div>
+
+                <div class="card col m-2" style="width: 18rem">
+                    <h1 class="cart-title">Your Top Artists</h1>
+                    <ul class="list-group list-group-flush" id="topArtist">
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+            crossorigin="anonymous"
+        ></script>
     </body>
 </html>

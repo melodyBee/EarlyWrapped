@@ -46,11 +46,16 @@ a {
     padding: 1rem;
     border-radius: 8px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: white;
 }
 
 .card:hover {
     transform: scale(1.05);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+.list-group-item {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: white;
 }
 .topTracks {
     width: 200px;
@@ -65,4 +70,26 @@ a {
 }
 footer {
     color: white;
+}
+#mainWindow {
+    color: white;
+    background-image: linear-gradient(to right, rgb(71, 50, 161), rgb(22, 79, 60));
+}
+.subHeading {
+    color: rgba(255, 255, 255, 0.8);
+}
+.subsubHead {
+    background: linear-gradient(to right, rgb(38, 164, 122), rgb(71, 50, 161));
+    font-size: x-small;
+    margin-left: 39%;
+    margin-right: 30%;
+    color: #43e67f;
+    font-weight: 700;
+    border-radius: 20px;
+    width: 250px;
+}
+.subsubHead:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(to right, rgb(71, 50, 161), rgb(40, 159, 119));
 }
