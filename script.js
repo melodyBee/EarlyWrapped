@@ -1,6 +1,7 @@
 const clientId = '5aab9ba401374e7292e3ee291e498067'
-const redirectUri = 'http://127.0.0.1:5500/EarlyWrapped.html'
+const redirectUri = 'https://melodybee.github.io/EarlyWrapped/EarlyWrapped/'
 const scopes = ['user-top-read', 'user-read-recently-played']
+
 function generateRandomString(length) {
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     let result = ''
@@ -9,12 +10,14 @@ function generateRandomString(length) {
     }
     return result
 }
+
 function base64encode(str) {
     return btoa(String.fromCharCode.apply(null, new Uint8Array(str)))
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
         .replace(/=+$/, '')
 }
+
 async function generateCodeChallenge(codeVerifier) {
     try {
         const data = new TextEncoder().encode(codeVerifier)
@@ -24,6 +27,7 @@ async function generateCodeChallenge(codeVerifier) {
         console.error('Error generating code challenge:', err)
     }
 }
+
 async function redirectToSpotifyLogin() {
     try {
         const codeVerifier = generateRandomString(64)
@@ -43,6 +47,7 @@ async function redirectToSpotifyLogin() {
         console.error('Error during redirect to Spotify login:', err)
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname
     if (path.endsWith('/') || path.includes('index.html')) {
@@ -58,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 })
+
 async function fetchAccessToken(code) {
     try {
         const codeVerifier = localStorage.getItem('spotify_code_verifier')
@@ -79,9 +85,10 @@ async function fetchAccessToken(code) {
         console.error('Error fetching access token:', err)
     }
 }
+
 window.addEventListener('load', async () => {
     try {
-        if (window.location.pathname.includes('EarlyWrapped.html')) {
+        if (window.location.pathname.includes('/EarlyWrapped/EarlyWrapped/')) {
             const params = new URLSearchParams(window.location.search)
             const code = params.get('code')
 
@@ -97,13 +104,15 @@ window.addEventListener('load', async () => {
                 const token = localStorage.getItem('spotify_token')
                 if (!token) {
                     console.warn('No token found, returning to login.')
-                    window.location.href = 'index.html'
+                    window.location.href = 'https://melodybee.github.io/EarlyWrapped/'
                     return
                 }
+
                 getTopTracks(token)
                 getTopArtists(token)
                 getListeningStats(token)
                 getUniqueArtists(token)
+
                 const downloadBtn = document.getElementById('downloadWrapped')
                 if (downloadBtn) {
                     try {
@@ -128,6 +137,7 @@ window.addEventListener('load', async () => {
         console.error('Window load error:', err)
     }
 })
+
 function getTopTracks(token) {
     fetch('https://api.spotify.com/v1/me/top/tracks?limit=5&time_range=long_term', {
         headers: { Authorization: `Bearer ${token}` },
@@ -139,16 +149,16 @@ function getTopTracks(token) {
                 const li = document.createElement('li')
                 li.className = 'list-group-item'
                 li.innerHTML = `
-  <span class="track-index">${index + 1}.</span> 
-  <span class="track-name">${track.name}</span> — 
-  <span class="track-artist-name">${track.artists[0].name}</span>
-`
-
+                    <span class="track-index">${index + 1}.</span> 
+                    <span class="track-name">${track.name}</span> — 
+                    <span class="track-artist-name">${track.artists[0].name}</span>
+                `
                 list.appendChild(li)
             })
         })
         .catch((err) => console.error('Top Tracks Error:', err))
 }
+
 function getTopArtists(token) {
     fetch('https://api.spotify.com/v1/me/top/artists?limit=5&time_range=long_term', {
         headers: { Authorization: `Bearer ${token}` },
@@ -159,9 +169,10 @@ function getTopArtists(token) {
             data.items.forEach((artist, index) => {
                 const li = document.createElement('li')
                 li.className = 'list-group-item'
-                li.innerHTML = `<span class="track-index">${
-                    index + 1
-                }.</span> <span class="artist-name">${artist.name}</span>`
+                li.innerHTML = `
+                    <span class="track-index">${index + 1}.</span> 
+                    <span class="artist-name">${artist.name}</span>
+                `
                 list.appendChild(li)
             })
 
@@ -176,6 +187,7 @@ function getTopArtists(token) {
         })
         .catch((err) => console.error('Top Artists Error:', err))
 }
+
 function getListeningStats(token) {
     fetch('https://api.spotify.com/v1/me/player/recently-played?limit=50', {
         headers: { Authorization: `Bearer ${token}` },
@@ -191,6 +203,7 @@ function getListeningStats(token) {
         })
         .catch((err) => console.error('Listening Stats Error:', err))
 }
+
 function getUniqueArtists(token) {
     fetch('https://api.spotify.com/v1/me/player/recently-played?limit=50', {
         headers: { Authorization: `Bearer ${token}` },
