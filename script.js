@@ -93,50 +93,53 @@ window.addEventListener('load', async () => {
         const code = params.get('code');
         const token = localStorage.getItem('spotify_token');
 
+        // Only run on the results page
         if (path.includes('EarlyWrapped')) {
+            // Case: First-time redirect back from Spotify
             if (code && !token) {
                 try {
                     const accessToken = await fetchAccessToken(code);
                     localStorage.setItem('spotify_token', accessToken);
                     const cleanUrl = window.location.origin + window.location.pathname;
                     window.history.replaceState({}, document.title, cleanUrl);
-                    window.location.href = cleanUrl;
+                    getTopTracks(accessToken);
+                    getTopArtists(accessToken);
+                    getListeningStats(accessToken);
+                    getUniqueArtists(accessToken);
                 } catch (error) {
                     console.error('Error exchanging code:', error);
                 }
-            } else if (token) {
+            }
+
+            else if (token) {
                 getTopTracks(token);
                 getTopArtists(token);
                 getListeningStats(token);
                 getUniqueArtists(token);
-
-                const downloadBtn = document.getElementById('downloadWrapped');
-                if (downloadBtn) {
-                    try {
-                        downloadBtn.addEventListener('click', () => {
-                            const target = document.getElementById('mainWindow');
-                            html2canvas(target)
-                                .then((canvas) => {
-                                    const link = document.createElement('a');
-                                    link.download = 'early-wrapped.png';
-                                    link.href = canvas.toDataURL();
-                                    link.click();
-                                })
-                                .catch((err) => console.error('Download canvas error:', err));
-                        });
-                    } catch (err) {
-                        console.error('Error binding download:', err);
-                    }
-                }
-            } else {
-                console.warn('No token or code, redirecting.');
-                window.location.href = 'https://melodybee.github.io/EarlyWrapped/';
+            }
+            else {
+                console.warn('No token or code found. User must click login.');
+            }
+            const downloadBtn = document.getElementById('downloadWrapped');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => {
+                    const target = document.getElementById('mainWindow');
+                    html2canvas(target)
+                        .then((canvas) => {
+                            const link = document.createElement('a');
+                            link.download = 'early-wrapped.png';
+                            link.href = canvas.toDataURL();
+                            link.click();
+                        })
+                        .catch((err) => console.error('Download canvas error:', err));
+                });
             }
         }
     } catch (err) {
         console.error('Window load error:', err);
     }
 });
+
 
 function getTopTracks(token) {
     fetch('https://api.spotify.com/v1/me/top/tracks?limit=5&time_range=long_term', {
