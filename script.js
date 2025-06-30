@@ -1,5 +1,5 @@
 const clientId = '5aab9ba401374e7292e3ee291e498067';
-const redirectUri = 'https://melodybee.github.io/EarlyWrapped/';
+const redirectUri = 'https://melodybee.github.io/EarlyWrapped/EarlyWrapped/';
 const scopes = ['user-top-read', 'user-read-recently-played'];
 
 function generateRandomString(length) {
