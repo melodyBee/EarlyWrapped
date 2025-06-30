@@ -19,192 +19,154 @@ function base64encode(str) {
 }
 
 async function generateCodeChallenge(codeVerifier) {
-    try {
-        const data = new TextEncoder().encode(codeVerifier);
-        const digest = await crypto.subtle.digest('SHA-256', data);
-        return base64encode(digest);
-    } catch (err) {
-        console.error('Error generating code challenge:', err);
-    }
+    const data = new TextEncoder().encode(codeVerifier);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    return base64encode(digest);
 }
 
 async function redirectToSpotifyLogin() {
-    try {
-        const codeVerifier = generateRandomString(64);
-        const codeChallenge = await generateCodeChallenge(codeVerifier);
-        localStorage.setItem('spotify_code_verifier', codeVerifier);
+    const codeVerifier = generateRandomString(64);
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
+    localStorage.setItem('spotify_code_verifier', codeVerifier);
 
-        const authUrl =
-            'https://accounts.spotify.com/authorize' +
-            '?response_type=code' +
-            `&client_id=${clientId}` +
-            `&scope=${encodeURIComponent(scopes.join(' '))}` +
-            `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-            `&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+    const authUrl = `https://accounts.spotify.com/authorize?response_type=code` +
+        `&client_id=${clientId}` +
+        `&scope=${encodeURIComponent(scopes.join(' '))}` +
+        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+        `&code_challenge_method=S256` +
+        `&code_challenge=${codeChallenge}`;
 
-        window.location.href = authUrl;
-    } catch (err) {
-        console.error('Error during redirect to Spotify login:', err);
-    }
+    window.location.href = authUrl;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('loginBtn');
     if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
-            redirectToSpotifyLogin();
-        });
+        loginBtn.addEventListener('click', redirectToSpotifyLogin);
     }
 });
 
 async function fetchAccessToken(code) {
-    try {
-        const codeVerifier = localStorage.getItem('spotify_code_verifier');
-        const body = new URLSearchParams({
-            client_id: clientId,
-            grant_type: 'authorization_code',
-            code: code,
-            redirect_uri: redirectUri,
-            code_verifier: codeVerifier,
-        });
-        const res = await fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: body.toString(),
-        });
-        const data = await res.json();
-        return data.access_token;
-    } catch (err) {
-        console.error('Error fetching access token:', err);
-    }
+    const codeVerifier = localStorage.getItem('spotify_code_verifier');
+    const body = new URLSearchParams({
+        client_id: clientId,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        code_verifier: codeVerifier
+    });
+
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+    });
+
+    const data = await res.json();
+    return data.access_token;
 }
 
 window.addEventListener('load', async () => {
-    try {
-        const path = window.location.pathname;
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
-        let token = localStorage.getItem('spotify_token');
+    const code = new URLSearchParams(window.location.search).get('code');
+    let token = localStorage.getItem('spotify_token');
 
-        if (code && !token) {
-            token = await fetchAccessToken(code);
-            if (token) {
-                localStorage.setItem('spotify_token', token);
-                const cleanUrl = window.location.origin + window.location.pathname;
-                window.history.replaceState({}, document.title, cleanUrl);
-
-                getTopTracks(token);
-                getTopArtists(token);
-                getListeningStats(token);
-                getUniqueArtists(token);
-            }
-        }
-
+    if (code && !token) {
+        token = await fetchAccessToken(code);
         if (token) {
-            getTopTracks(token);
-            getTopArtists(token);
-            getListeningStats(token);
-            getUniqueArtists(token);
-
-            const downloadBtn = document.getElementById('downloadWrapped');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', () => {
-                    const target = document.getElementById('mainWindow');
-                    html2canvas(target)
-                        .then((canvas) => {
-                            const link = document.createElement('a');
-                            link.download = 'early-wrapped.png';
-                            link.href = canvas.toDataURL();
-                            link.click();
-                        })
-                        .catch((err) => console.error('Download canvas error:', err));
-                });
-            }
+            localStorage.setItem('spotify_token', token);
+            window.history.replaceState({}, document.title, redirectUri);
         }
-    } catch (err) {
-        console.error('Window load error:', err);
+    }
+
+    if (token) {
+        getTopTracks(token);
+        getTopArtists(token);
+        getListeningStats(token);
+        getUniqueArtists(token);
+
+        const downloadBtn = document.getElementById('downloadWrapped');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => {
+                const target = document.getElementById('mainWindow');
+                html2canvas(target)
+                    .then((canvas) => {
+                        const link = document.createElement('a');
+                        link.download = 'early-wrapped.png';
+                        link.href = canvas.toDataURL();
+                        link.click();
+                    })
+                    .catch(err => console.error('Download error:', err));
+            });
+        }
     }
 });
 
 function getTopTracks(token) {
     fetch('https://api.spotify.com/v1/me/top/tracks?limit=5&time_range=long_term', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
     })
-        .then((res) => res.json())
-        .then((data) => {
+        .then(res => res.json())
+        .then(data => {
             const list = document.getElementById('topTracks');
             if (!list) return;
-            data.items.forEach((track, index) => {
+            data.items.forEach((track, i) => {
                 const li = document.createElement('li');
                 li.className = 'list-group-item';
-                li.innerHTML = `
-  <span class="track-index">${index + 1}.</span> 
-  <span class="track-name">${track.name}</span> — 
-  <span class="track-artist-name">${track.artists[0].name}</span>
-`;
+                li.innerHTML = `<span class="track-index">${i + 1}.</span> 
+                                <span class="track-name">${track.name}</span> — 
+                                <span class="track-artist-name">${track.artists[0].name}</span>`;
                 list.appendChild(li);
             });
         })
-        .catch((err) => console.error('Top Tracks Error:', err));
+        .catch(err => console.error('Top Tracks Error:', err));
 }
 
 function getTopArtists(token) {
     fetch('https://api.spotify.com/v1/me/top/artists?limit=5&time_range=long_term', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
     })
-        .then((res) => res.json())
-        .then((data) => {
+        .then(res => res.json())
+        .then(data => {
             const list = document.getElementById('topArtist');
             if (!list) return;
-            data.items.forEach((artist, index) => {
+            data.items.forEach((artist, i) => {
                 const li = document.createElement('li');
                 li.className = 'list-group-item';
-                li.innerHTML = `<span class="track-index">${index + 1}.</span> <span class="artist-name">${artist.name}</span>`;
+                li.innerHTML = `<span class="track-index">${i + 1}.</span> <span class="artist-name">${artist.name}</span>`;
                 list.appendChild(li);
             });
 
-            const artistWithGenre = data.items.find(
-                (artist) => artist.genres && artist.genres.length > 0
-            );
-            const topGenre = document.getElementById('topGenre');
-            if (topGenre) {
-                topGenre.textContent = artistWithGenre ? artistWithGenre.genres[0] : 'Unknown';
-            }
+            const genre = data.items.find(a => a.genres?.length)?.genres[0] || 'Unknown';
+            const genreElem = document.getElementById('topGenre');
+            if (genreElem) genreElem.textContent = genre;
         })
-        .catch((err) => console.error('Top Artists Error:', err));
+        .catch(err => console.error('Top Artists Error:', err));
 }
 
 function getListeningStats(token) {
     fetch('https://api.spotify.com/v1/me/player/recently-played?limit=50', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
     })
-        .then((res) => res.json())
-        .then((data) => {
-            let totalMs = 0;
-            data.items.forEach((item) => {
-                totalMs += item.track.duration_ms;
-            });
-            const totalMinutes = Math.round(totalMs / 60000);
-            const totalMinutesElem = document.getElementById('totalMinutes');
-            if (totalMinutesElem) {
-                totalMinutesElem.textContent = totalMinutes;
-            }
+        .then(res => res.json())
+        .then(data => {
+            const totalMs = data.items.reduce((acc, item) => acc + item.track.duration_ms, 0);
+            const totalMin = Math.round(totalMs / 60000);
+            const statElem = document.getElementById('totalMinutes');
+            if (statElem) statElem.textContent = totalMin;
         })
-        .catch((err) => console.error('Listening Stats Error:', err));
+        .catch(err => console.error('Listening Stats Error:', err));
 }
 
 function getUniqueArtists(token) {
     fetch('https://api.spotify.com/v1/me/player/recently-played?limit=50', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
     })
-        .then((res) => res.json())
-        .then((data) => {
-            const artistIDs = data.items.map((item) => item.track.artists[0].id);
-            const uniqueArtists = new Set(artistIDs);
+        .then(res => res.json())
+        .then(data => {
+            const ids = data.items.map(item => item.track.artists[0].id);
+            const uniqueCount = new Set(ids).size;
             const uniqueElem = document.getElementById('uniqueArtists');
-            if (uniqueElem) {
-                uniqueElem.textContent = uniqueArtists.size;
-            }
+            if (uniqueElem) uniqueElem.textContent = uniqueCount;
         })
-        .catch((err) => console.error('Unique Artists Error:', err));
+        .catch(err => console.error('Unique Artists Error:', err));
 }
