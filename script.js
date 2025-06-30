@@ -29,27 +29,22 @@ async function generateCodeChallenge(codeVerifier) {
 }
 
 async function redirectToSpotifyLogin() {
-    try {
-        const codeVerifier = generateRandomString(64);
-        const codeChallenge = await generateCodeChallenge(codeVerifier);
-        localStorage.setItem('spotify_code_verifier', codeVerifier);
+    const codeVerifier = generateRandomString(64);
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
+    localStorage.setItem('spotify_code_verifier', codeVerifier);
 
-        const authUrl =
-            'https://accounts.spotify.com/authorize' +
-            '?response_type=code' +
-            `&client_id=${clientId}` +
-            `&scope=${scopes.join('%20')}` +
-            `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-            `&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+    const authUrl =
+        'https://accounts.spotify.com/authorize' +
+        '?response_type=code' +
+        `&client_id=${clientId}` +
+        `&scope=${scopes.join('%20')}` +
+        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+        `&code_challenge_method=S256&code_challenge=${codeChallenge}`;
 
-        window.location.href = authUrl;
-    } catch (err) {
-        console.error('Error during redirect to Spotify login:', err);
-    }
+    window.location.href = authUrl;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const path = window.location.pathname;
     const loginBtn = document.getElementById('loginBtn');
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
@@ -81,56 +76,56 @@ async function fetchAccessToken(code) {
 }
 
 window.addEventListener('load', async () => {
-    try {
-        const path = window.location.pathname;
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
-        let token = localStorage.getItem('spotify_token');
+    const path = window.location.pathname;
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    let token = localStorage.getItem('spotify_token');
 
-        if (path.includes('EarlyWrapped')) {
-            if (code && !token) {
-                try {
-                    token = await fetchAccessToken(code);
-                    if (token) {
-                        localStorage.setItem('spotify_token', token);
-                        const cleanUrl = window.location.origin + window.location.pathname;
-                        window.history.replaceState({}, document.title, cleanUrl);
-                        getTopTracks(token);
-                        getTopArtists(token);
-                        getListeningStats(token);
-                        getUniqueArtists(token);
-                    } else {
-                        console.error('No token returned');
-                    }
-                } catch (error) {
-                    console.error('Error exchanging code:', error);
+    if (path.includes('EarlyWrapped')) {
+        if (code && !token) {
+            try {
+                token = await fetchAccessToken(code);
+                if (token) {
+                    localStorage.setItem('spotify_token', token);
+                    const cleanUrl = window.location.origin + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                } else {
+                    console.error('No token returned from Spotify');
+                    return;
                 }
-            } else if (token) {
-                getTopTracks(token);
-                getTopArtists(token);
-                getListeningStats(token);
-                getUniqueArtists(token);
-            } else {
-                console.warn('No token or code found. Awaiting login interaction.');
-            }
-
-            const downloadBtn = document.getElementById('downloadWrapped');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', () => {
-                    const target = document.getElementById('mainWindow');
-                    html2canvas(target)
-                        .then((canvas) => {
-                            const link = document.createElement('a');
-                            link.download = 'early-wrapped.png';
-                            link.href = canvas.toDataURL();
-                            link.click();
-                        })
-                        .catch((err) => console.error('Download canvas error:', err));
-                });
+            } catch (err) {
+                console.error('Error fetching token from code:', err);
+                return;
             }
         }
-    } catch (err) {
-        console.error('Window load error:', err);
+
+        // Refresh token from storage in case it was just set
+        token = localStorage.getItem('spotify_token');
+        if (token) {
+            getTopTracks(token);
+            getTopArtists(token);
+            getListeningStats(token);
+            getUniqueArtists(token);
+        } else {
+            console.warn('No token found even after login');
+            return;
+        }
+
+        // Setup download button
+        const downloadBtn = document.getElementById('downloadWrapped');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => {
+                const target = document.getElementById('mainWindow');
+                html2canvas(target)
+                    .then((canvas) => {
+                        const link = document.createElement('a');
+                        link.download = 'early-wrapped.png';
+                        link.href = canvas.toDataURL();
+                        link.click();
+                    })
+                    .catch((err) => console.error('Canvas download error:', err));
+            });
+        }
     }
 });
 
@@ -146,10 +141,10 @@ function getTopTracks(token) {
                 const li = document.createElement('li');
                 li.className = 'list-group-item';
                 li.innerHTML = `
-  <span class="track-index">${index + 1}.</span> 
-  <span class="track-name">${track.name}</span> — 
-  <span class="track-artist-name">${track.artists[0].name}</span>
-`;
+                    <span class="track-index">${index + 1}.</span> 
+                    <span class="track-name">${track.name}</span> — 
+                    <span class="track-artist-name">${track.artists[0].name}</span>
+                `;
                 list.appendChild(li);
             });
         })
@@ -167,14 +162,15 @@ function getTopArtists(token) {
             data.items.forEach((artist, index) => {
                 const li = document.createElement('li');
                 li.className = 'list-group-item';
-                li.innerHTML = `<span class="track-index">${index + 1}.</span> <span class="artist-name">${artist.name}</span>`;
+                li.innerHTML = `
+                    <span class="track-index">${index + 1}.</span>
+                    <span class="artist-name">${artist.name}</span>
+                `;
                 list.appendChild(li);
             });
 
-            const artistWithGenre = data.items.find(
-                (artist) => artist.genres && artist.genres.length > 0
-            );
             const topGenre = document.getElementById('topGenre');
+            const artistWithGenre = data.items.find((artist) => artist.genres?.length > 0);
             if (topGenre) {
                 topGenre.textContent = artistWithGenre ? artistWithGenre.genres[0] : 'Unknown';
             }
@@ -188,15 +184,10 @@ function getListeningStats(token) {
     })
         .then((res) => res.json())
         .then((data) => {
-            let totalMs = 0;
-            data.items.forEach((item) => {
-                totalMs += item.track.duration_ms;
-            });
+            const totalMs = data.items.reduce((sum, item) => sum + item.track.duration_ms, 0);
             const totalMinutes = Math.round(totalMs / 60000);
             const totalMinutesElem = document.getElementById('totalMinutes');
-            if (totalMinutesElem) {
-                totalMinutesElem.textContent = totalMinutes;
-            }
+            if (totalMinutesElem) totalMinutesElem.textContent = totalMinutes;
         })
         .catch((err) => console.error('Listening Stats Error:', err));
 }
@@ -210,9 +201,7 @@ function getUniqueArtists(token) {
             const artistIDs = data.items.map((item) => item.track.artists[0].id);
             const uniqueArtists = new Set(artistIDs);
             const uniqueElem = document.getElementById('uniqueArtists');
-            if (uniqueElem) {
-                uniqueElem.textContent = uniqueArtists.size;
-            }
+            if (uniqueElem) uniqueElem.textContent = uniqueArtists.size;
         })
         .catch((err) => console.error('Unique Artists Error:', err));
 }
