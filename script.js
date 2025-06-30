@@ -50,17 +50,11 @@ async function redirectToSpotifyLogin() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
-    if (path === '/' || path.endsWith('index.html')) {
-        const loginBtn = document.getElementById('loginBtn');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', () => {
-                try {
-                    redirectToSpotifyLogin();
-                } catch (err) {
-                    console.error('Login button click error:', err);
-                }
-            });
-        }
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            redirectToSpotifyLogin();
+        });
     }
 });
 
@@ -91,35 +85,35 @@ window.addEventListener('load', async () => {
         const path = window.location.pathname;
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
-        const token = localStorage.getItem('spotify_token');
+        let token = localStorage.getItem('spotify_token');
 
-        // Only run on the results page
         if (path.includes('EarlyWrapped')) {
-            // Case: First-time redirect back from Spotify
             if (code && !token) {
                 try {
-                    const accessToken = await fetchAccessToken(code);
-                    localStorage.setItem('spotify_token', accessToken);
-                    const cleanUrl = window.location.origin + window.location.pathname;
-                    window.history.replaceState({}, document.title, cleanUrl);
-                    getTopTracks(accessToken);
-                    getTopArtists(accessToken);
-                    getListeningStats(accessToken);
-                    getUniqueArtists(accessToken);
+                    token = await fetchAccessToken(code);
+                    if (token) {
+                        localStorage.setItem('spotify_token', token);
+                        const cleanUrl = window.location.origin + window.location.pathname;
+                        window.history.replaceState({}, document.title, cleanUrl);
+                        getTopTracks(token);
+                        getTopArtists(token);
+                        getListeningStats(token);
+                        getUniqueArtists(token);
+                    } else {
+                        console.error('No token returned');
+                    }
                 } catch (error) {
                     console.error('Error exchanging code:', error);
                 }
-            }
-
-            else if (token) {
+            } else if (token) {
                 getTopTracks(token);
                 getTopArtists(token);
                 getListeningStats(token);
                 getUniqueArtists(token);
+            } else {
+                console.warn('No token or code found. Awaiting login interaction.');
             }
-            else {
-                console.warn('No token or code found. User must click login.');
-            }
+
             const downloadBtn = document.getElementById('downloadWrapped');
             if (downloadBtn) {
                 downloadBtn.addEventListener('click', () => {
@@ -139,7 +133,6 @@ window.addEventListener('load', async () => {
         console.error('Window load error:', err);
     }
 });
-
 
 function getTopTracks(token) {
     fetch('https://api.spotify.com/v1/me/top/tracks?limit=5&time_range=long_term', {
