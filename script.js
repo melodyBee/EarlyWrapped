@@ -98,9 +98,9 @@ window.addEventListener('load', async () => {
                 try {
                     const accessToken = await fetchAccessToken(code);
                     localStorage.setItem('spotify_token', accessToken);
-                    const cleanUrl = path;
+                    const cleanUrl = window.location.origin + window.location.pathname;
                     window.history.replaceState({}, document.title, cleanUrl);
-                    location.reload();
+                    window.location.href = cleanUrl;
                 } catch (error) {
                     console.error('Error exchanging code:', error);
                 }
