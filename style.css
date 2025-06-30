@@ -17,7 +17,7 @@ body {
 .mainHeading {
     font-size: 80px;
     font-weight: 800;
-    background: linear-gradient(to right, rgb(77, 194, 155), rgb(92, 66, 206));
+    background: linear-gradient(to right, rgb(77, 194, 155), rgb(87, 28, 135));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -38,11 +38,11 @@ a {
 #main {
     padding: 80px;
     color: white;
-    background-image: linear-gradient(to right, rgb(71, 50, 161), rgb(22, 79, 60));
+    background-image: linear-gradient(to right, rgb(87, 28, 135), rgb(22, 79, 60));
 }
 
 .card {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.1);
     padding: 1rem;
     border-radius: 8px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -73,13 +73,13 @@ footer {
 }
 #mainWindow {
     color: white;
-    background-image: linear-gradient(to right, rgb(71, 50, 161), rgb(30, 215, 96));
+    background-image: linear-gradient(to right, rgb(87, 28, 135), rgb(30, 215, 96, 0.7));
 }
 .subHeading {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.5);
 }
 .subsubHead {
-    background: linear-gradient(to right, rgb(30, 215, 96), rgb(71, 50, 161));
+    background: linear-gradient(to right, rgb(30, 215, 96, 0.5), rgb(87, 28, 135));
     font-size: x-small;
     margin-left: 39%;
     margin-right: 30%;
@@ -91,7 +91,50 @@ footer {
 .subsubHead:hover {
     transform: scale(1.05);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    background: linear-gradient(to right, rgb(71, 50, 161), rgb(40, 159, 119));
+    background: linear-gradient(to right, rgb(87, 28, 135, 0.8), rgb(40, 159, 119, 0.8));
+}
+li {
+    /* padding: 20px; */
+    margin: 5px;
+    border: solid;
+    border-color: none;
+    border-radius: 2%;
+}
+.track-index {
+    color: #1ed760;
+    font-weight: bold;
+    margin-right: 4px;
+}
+.list-group-item {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    backdrop-filter: blur(4px); /* optional: softens the background behind */
+}
+
+.track-name {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.artist-name {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.UniqueArt {
+    color: rgb(168, 62, 255);
+    font-weight: 700;
+}
+.genreTop {
+    color: #60a5fa;
+    font-weight: 700;
+}
+.totalMin {
+    color: #1ed760;
+    font-weight: 700;
 }
 #downloadWrapped {
     background-color: #1ed760;
@@ -101,8 +144,4 @@ footer {
 }
 #downloadWrapped:hover {
     background-color: #169b4e;
-}
-li {
-    padding: 20px;
-    margin: 20px;
 }
