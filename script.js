@@ -141,7 +141,7 @@ function getTopTracks(token) {
                 li.innerHTML = `
   <span class="track-index">${index + 1}.</span> 
   <span class="track-name">${track.name}</span> — 
-  <span class="artist-name">${track.artists[0].name}</span>
+  <span class="track-artist-name">${track.artists[0].name}</span>
 `
 
                 list.appendChild(li)
@@ -159,7 +159,9 @@ function getTopArtists(token) {
             data.items.forEach((artist, index) => {
                 const li = document.createElement('li')
                 li.className = 'list-group-item'
-                li.textContent = `${index + 1}. ${artist.name}`
+                li.innerHTML = `<span class="track-index">${
+                    index + 1
+                }.</span> <span class="artist-name">${artist.name}</span>`
                 list.appendChild(li)
             })
 

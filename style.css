@@ -3,9 +3,14 @@
 body {
     font-family: 'Montserrat', sans-serif;
     background: black;
-    padding: 0%;
-    margin: 0%;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
+
 #intro {
     background-color: #0d1f3a;
     color: white;
@@ -72,9 +77,15 @@ footer {
     color: white;
 }
 #mainWindow {
+    margin: 0;
+    padding: 0;
+    border-radius: 12px;
+    background-image: linear-gradient(to right, rgb(71, 50, 161), rgb(30, 215, 96, 0.7));
     color: white;
-    background-image: linear-gradient(to right, rgb(87, 28, 135), rgb(30, 215, 96, 0.7));
+    width: 100%;
+    min-height: 100vh;
 }
+
 .subHeading {
     color: rgba(255, 255, 255, 0.5);
 }
@@ -103,6 +114,7 @@ li {
 .track-index {
     color: #1ed760;
     font-weight: bold;
+    font-size: 19px;
     margin-right: 4px;
 }
 .list-group-item {
@@ -120,10 +132,14 @@ li {
     font-size: 20px;
 }
 
-.artist-name {
+.track-artist-name {
     color: rgba(255, 255, 255, 0.8);
 }
-
+.artist-name {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 600;
+}
 .UniqueArt {
     color: rgb(168, 62, 255);
     font-weight: 700;

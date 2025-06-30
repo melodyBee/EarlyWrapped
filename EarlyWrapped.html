@@ -27,7 +27,7 @@
 
         <div class="container">
             <div class="row">
-                <div class="col">
+                <div class="col-12 col-md-4">
                     <div class="card">
                         <div class="card-body">
                             <h2>Total Minutes</h2>
@@ -36,7 +36,7 @@
                     </div>
                 </div>
 
-                <div class="col">
+                <div class="col-12 col-md-4">
                     <div class="card">
                         <div class="card-body">
                             <h2>Top Genre</h2>
@@ -45,7 +45,7 @@
                     </div>
                 </div>
 
-                <div class="col">
+                <div class="col-12 col-md-4">
                     <div class="card">
                         <div class="card-body">
                             <h2>Unique Artists</h2>
@@ -55,24 +55,28 @@
                 </div>
             </div>
         </div>
-
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
-                <div class="card col m-2" style="width: 18rem">
-                    <h1 class="cart-title">Your Top Tracks</h1>
-                    <ul class="list-group list-group-flush rounded" id="topTracks"></ul>
+                <div class="col-12 col-md-6 p-3">
+                    <div class="card h-100 w-100">
+                        <h1 class="cart-title">Your Top Tracks</h1>
+                        <ul class="list-group list-group-flush rounded" id="topTracks"></ul>
+                    </div>
                 </div>
 
-                <div class="card col m-2" style="width: 18rem">
-                    <h1 class="cart-title">Your Top Artists</h1>
-                    <ul class="list-group list-group-flush rounded" id="topArtist"></ul>
+                <div class="col-12 col-md-6 p-3">
+                    <div class="card h-100 w-100">
+                        <h1 class="cart-title">Your Top Artists</h1>
+                        <ul class="list-group list-group-flush rounded" id="topArtist"></ul>
+                    </div>
                 </div>
             </div>
         </div>
+
         <div class="text-center my-4">
-            <button id="downloadWrapped" class="btn">Download My Wrapped</button>
+            <!-- <button id="downloadWrapped" class="btn">Download My Wrapped</button> -->
             <footer>
-                <p class="text-center">
+                <p class="text-center my-4">
                     Not affiliated with Spotify. Made by
                     <a href="https://github.com/melodyBee">melodyBee </a>
                     ❤️
