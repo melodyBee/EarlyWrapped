@@ -38,7 +38,7 @@ async function redirectToSpotifyLogin() {
             'https://accounts.spotify.com/authorize' +
             '?response_type=code' +
             `&client_id=${clientId}` +
-            `&scope=${scopes.join('%20')}` +
+            `&scope=${encodeURIComponent(scopes.join(' '))}` +
             `&redirect_uri=${encodeURIComponent(redirectUri)}` +
             `&code_challenge_method=S256&code_challenge=${codeChallenge}`;
 
@@ -49,7 +49,6 @@ async function redirectToSpotifyLogin() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const path = window.location.pathname;
     const loginBtn = document.getElementById('loginBtn');
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
@@ -87,32 +86,25 @@ window.addEventListener('load', async () => {
         const code = params.get('code');
         let token = localStorage.getItem('spotify_token');
 
-        if (path.includes('EarlyWrapped')) {
-            if (code && !token) {
-                try {
-                    token = await fetchAccessToken(code);
-                    if (token) {
-                        localStorage.setItem('spotify_token', token);
-                        const cleanUrl = window.location.origin + window.location.pathname;
-                        window.history.replaceState({}, document.title, cleanUrl);
-                        getTopTracks(token);
-                        getTopArtists(token);
-                        getListeningStats(token);
-                        getUniqueArtists(token);
-                    } else {
-                        console.error('No token returned');
-                    }
-                } catch (error) {
-                    console.error('Error exchanging code:', error);
-                }
-            } else if (token) {
+        if (code && !token) {
+            token = await fetchAccessToken(code);
+            if (token) {
+                localStorage.setItem('spotify_token', token);
+                const cleanUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+
                 getTopTracks(token);
                 getTopArtists(token);
                 getListeningStats(token);
                 getUniqueArtists(token);
-            } else {
-                console.warn('No token or code found. Awaiting login interaction.');
             }
+        }
+
+        if (token) {
+            getTopTracks(token);
+            getTopArtists(token);
+            getListeningStats(token);
+            getUniqueArtists(token);
 
             const downloadBtn = document.getElementById('downloadWrapped');
             if (downloadBtn) {
