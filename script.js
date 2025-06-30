@@ -1,7 +1,5 @@
 const clientId = '5aab9ba401374e7292e3ee291e498067'
 const redirectUri = 'https://melodybee.github.io/EarlyWrapped/EarlyWrapped/'
-console.log('Auth URL:', authUrl)
-
 const scopes = ['user-top-read', 'user-read-recently-played']
 
 function generateRandomString(length) {
@@ -52,7 +50,7 @@ async function redirectToSpotifyLogin() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname
-    if (path.endsWith('/') || path.includes('index.html')) {
+    if (path === '/' || path.endsWith('index.html')) {
         const loginBtn = document.getElementById('loginBtn')
         if (loginBtn) {
             loginBtn.addEventListener('click', () => {
@@ -90,31 +88,27 @@ async function fetchAccessToken(code) {
 
 window.addEventListener('load', async () => {
     try {
-        if (window.location.pathname.includes('EarlyWrapped')) {
-            const params = new URLSearchParams(window.location.search)
-            const code = params.get('code')
+        const path = window.location.pathname
+        const params = new URLSearchParams(window.location.search)
+        const code = params.get('code')
+        const token = localStorage.getItem('spotify_token')
 
-            if (code) {
+        if (path.includes('EarlyWrapped')) {
+            if (code && !token) {
                 try {
-                    const token = await fetchAccessToken(code)
-                    localStorage.setItem('spotify_token', token)
-                    window.location.href = redirectUri
+                    const accessToken = await fetchAccessToken(code)
+                    localStorage.setItem('spotify_token', accessToken)
+                    const cleanUrl = path
+                    window.history.replaceState({}, document.title, cleanUrl)
+                    location.reload()
                 } catch (error) {
                     console.error('Error exchanging code:', error)
                 }
-            } else {
-                const token = localStorage.getItem('spotify_token')
-                if (!token) {
-                    console.warn('No token found, returning to login.')
-                    window.location.href = 'https://melodybee.github.io/EarlyWrapped/'
-                    return
-                }
-                document.addEventListener('DOMContentLoaded', () => {
-                    getTopTracks(token)
-                    getTopArtists(token)
-                    getListeningStats(token)
-                    getUniqueArtists(token)
-                })
+            } else if (token) {
+                getTopTracks(token)
+                getTopArtists(token)
+                getListeningStats(token)
+                getUniqueArtists(token)
 
                 const downloadBtn = document.getElementById('downloadWrapped')
                 if (downloadBtn) {
@@ -134,6 +128,9 @@ window.addEventListener('load', async () => {
                         console.error('Error binding download:', err)
                     }
                 }
+            } else {
+                console.warn('No token or code, redirecting.')
+                window.location.href = 'https://melodybee.github.io/EarlyWrapped/'
             }
         }
     } catch (err) {
@@ -147,7 +144,6 @@ function getTopTracks(token) {
     })
         .then((res) => res.json())
         .then((data) => {
-            console.log('Top Tracks API:', data)
             const list = document.getElementById('topTracks')
             if (!list) return
             data.items.forEach((track, index) => {
@@ -170,7 +166,6 @@ function getTopArtists(token) {
     })
         .then((res) => res.json())
         .then((data) => {
-            console.log('Top Artists API:', data)
             const list = document.getElementById('topArtist')
             if (!list) return
             data.items.forEach((artist, index) => {
@@ -199,7 +194,6 @@ function getListeningStats(token) {
     })
         .then((res) => res.json())
         .then((data) => {
-            console.log('Listening Stats API:', data)
             let totalMs = 0
             data.items.forEach((item) => {
                 totalMs += item.track.duration_ms
@@ -219,7 +213,6 @@ function getUniqueArtists(token) {
     })
         .then((res) => res.json())
         .then((data) => {
-            console.log('Unique Artists API:', data)
             const artistIDs = data.items.map((item) => item.track.artists[0].id)
             const uniqueArtists = new Set(artistIDs)
             const uniqueElem = document.getElementById('uniqueArtists')
